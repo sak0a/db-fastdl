@@ -1,0 +1,53 @@
+.spotlight
+  background: linear-gradient(45deg, #DC4200FF 0%, #E46A36FF 50%, #002de1 100%)
+  filter: blur(20vh)
+  height: 40vh
+  bottom: -30vh
+.gradient-border
+  -webkit-backdrop-filter: blur(10px)
+  backdrop-filter: blur(10px)
+  @apply relative
+
+.gradient-border
+  background-color: rgba(20, 20, 20, 0.3)
+
+.gradient-border::before
+  border-radius: 100px
+  background: linear-gradient(90deg,#303030 0%,#303030 25%, #dc4200 50%, #e46a36 75%, #002de1 100%)
+
+.gradient-border::before
+  content: ""
+  position: absolute
+  top: 0
+  left: 0
+  right: 0
+  bottom: 0
+  padding: 2px
+  width: 100%
+  background-size: 400% auto
+  opacity: 0.5
+  transition: background-position 0.3s ease-in-out, opacity 0.2s ease-in-out
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)
+  -webkit-mask-composite: xor
+  mask-composite: exclude
+.gradient-border:hover::before
+  background-position: -50% 0
+  opacity: 1
+
+
+.page__container
+  @apply text-center mx-auto h-screen flex items-center justify-center flex-col gap-6 font-sans animate-fadescale
+  img
+    @apply aspect-auto max-w-xs md:max-w-sm
+  .section__container
+    @apply rounded-2xl max-w-sm md:max-w-md w-full bg-white bg-opacity-5 px-8 py-4 text-white text-opacity-80 z-20
+    h1
+      @apply text-3xl md:text-4xl
+    h2
+      @apply text-sm md:text-sm
+    .back-home-btn
+      @apply absolute top-6 left-6 md:left-10 md:top-10 px-4 py-2 pt-3 cursor-pointer
+    .container__grid
+      @apply pt-2 pb-5 grid grid-cols-1 gap-4
+      .link__page
+        @apply gradient-border sm:text-xl py-2 px-4 sm:py-3 sm:px-6 cursor-pointer
