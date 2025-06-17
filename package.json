@@ -11,13 +11,13 @@
   },
   "devDependencies": {
     "@nuxt/devtools": "latest",
-    "@nuxtjs/tailwindcss": "^6.8.0",
-    "nuxt": "^3.7.3",
-    "sass": "^1.67.0",
+    "@nuxtjs/tailwindcss": "^6.14.0",
+    "nuxt": "^3.17.5",
+    "sass": "^1.89.2",
     "@types/bun": "latest"
   },
   "module": "index.ts",
   "peerDependencies": {
-    "typescript": "^5.0.0"
+    "typescript": "^5.8.3"
   }
 }
