@@ -10,10 +10,10 @@
       <h2>i guess</h2>
       <div class="container__grid">
         <br />
-        <NuxtLink to="/tf2" class="link__page">
+        <NuxtLink to="/db-fastdl/tf2" class="link__page">
           Team Fortress 2 Downloads
         </NuxtLink>
-        <NuxtLink to="/web" class="link__page">
+        <NuxtLink to="/db-fastdl/web" class="link__page">
           Web Dev Downloads
         </NuxtLink>
       </div>
