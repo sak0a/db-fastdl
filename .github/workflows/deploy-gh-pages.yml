@@ -1,14 +1,20 @@
-# GitHub Actions workflow to build Nuxt 3 static site and deploy to gh-pages
+# GitHub Actions workflow to build Nuxt 3 static site and deploy to GitHub Pages
 # - Builds with `npm run generate` (uses `nuxt generate` from package.json)
 # - Detects generated publish directory (`dist` or `.output/public`)
 # - Copies the TF maps from `assets/tf` into the publish root as `tf/`
 # - Copies the JS files from `assets/js` into the publish root as `js/`
-# - Deploys the assembled `deploy/` directory to the `gh-pages` branch
+# - Deploys the assembled artifact to GitHub Pages using native Actions
 
-name: Deploy to GitHub Pages
+name: Deploy to GitHub Pages (Nuxt static)
 
 permissions:
-  contents: write
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
 
 on:
   push:
@@ -17,34 +23,29 @@ on:
   workflow_dispatch: {}
 
 jobs:
-  build-and-deploy:
+  build:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Use Node.js 20
+      - name: Use Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 18
           cache: 'npm'
 
       - name: Install dependencies
         run: npm ci || npm install --no-audit --no-fund
-        env:
-          # Force rebuild of native modules for the current platform
-          npm_config_build_from_source: true
 
       - name: Generate static site
         run: npm run generate
 
-      - name: Prepare publish directory and copy assets
+      - name: Prepare artifact (include maps)
         run: |
           set -euo pipefail
-          
           PUBLISH_SRC=""
           if [ -d "dist" ]; then
             PUBLISH_SRC="dist"
@@ -55,42 +56,52 @@ jobs:
             ls -la
             exit 1
           fi
-          
           echo "Using publish source: $PUBLISH_SRC"
-          
-          rm -rf deploy
-          mkdir -p deploy
-          
-          # Copy the generated site into deploy
-          cp -a "$PUBLISH_SRC/." deploy/
-          
-          # Copy maps from assets/tf into deploy/tf so they are available at /db-fastdl/tf/*
+
+          rm -rf pages_artifact
+          mkdir -p pages_artifact
+          cp -a "$PUBLISH_SRC/." pages_artifact/
+
+          # Ensure TF maps are included so they're downloadable at /db-fastdl/tf/*
           if [ -d "assets/tf" ]; then
-            mkdir -p deploy/tf
-            cp -a assets/tf/. deploy/tf/
-            echo "Copied assets/tf -> deploy/tf"
+            mkdir -p pages_artifact/tf
+            cp -a assets/tf/. pages_artifact/tf/
+            echo "Copied assets/tf -> pages_artifact/tf"
           else
             echo "No assets/tf directory found; skipping TF map copy"
           fi
-          
-          # Copy files from assets/js into deploy/js so they are available at /db-fastdl/js/*
+
+          # Also copy assets/js if present
           if [ -d "assets/js" ]; then
-            mkdir -p deploy/js
-            cp -a assets/js/. deploy/js/
-            echo "Copied assets/js -> deploy/js"
-          else
-            echo "No assets/js directory found; skipping JS file copy"
+            mkdir -p pages_artifact/js
+            cp -a assets/js/. pages_artifact/js/
+            echo "Copied assets/js -> pages_artifact/js"
           fi
 
-      - name: Deploy to gh-pages
-        uses: peaceiris/actions-gh-pages@v3
+      - name: Inspect pages_artifact (debug)
+        run: |
+          echo "pages_artifact summary:" && du -sh pages_artifact || true
+          echo "Top-level contents:" && ls -la pages_artifact | sed -n '1,200p' || true
+          if [ -d "pages_artifact/tf" ]; then echo "tf listing:" && find pages_artifact/tf -maxdepth 2 -type f -print | sed -n '1,200p' || true; fi
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
         with:
-          deploy_key: ${{ secrets.ACTIONS_DEPLOY_KEY }}
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./deploy
-          publish_branch: gh-pages
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          path: pages_artifact
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
 
 # Notes for usage:
 # - This workflow expects your default branch is named `master`. Adjust the `on.push.branches` value if different.
