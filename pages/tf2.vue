@@ -19,7 +19,7 @@
           <i class="fab fa-discord text-white text-lg mr-2" aria-hidden="true"></i>
           Join the Discord
         </a>
-        <a href="/tf" class="link__page">
+        <a href="/db-fastdl/tf" class="link__page">
           Go to Directory
         </a>
       </div>

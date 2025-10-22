@@ -18,7 +18,7 @@
       <h2>Fast Download for JS / TS / Images / Fonts</h2>
       <div class="container__grid">
         <br />
-        <a href="/js" class="link__page">
+        <a href="/db-fastdl/js" class="link__page">
           Go to Directory
         </a>
       </div>
