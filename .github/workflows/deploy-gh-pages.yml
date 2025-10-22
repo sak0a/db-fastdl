@@ -27,7 +27,7 @@ jobs:
           node-version: 18
 
       - name: Install dependencies
-        run: npm ci
+        run: npm ci || npm install --no-audit --no-fund
 
       - name: Generate static site
         run: npm run generate
@@ -69,7 +69,6 @@ jobs:
           # but GITHUB_TOKEN works for typical cases where you just want to publish to gh-pages branch.
           publish_dir: ./deploy
           publish_branch: gh-pages
-          keep_history: true
         env:
           # When deploy_key is not provided the action will use GITHUB_TOKEN automatically.
           # Expose GITHUB_TOKEN explicitly for clarity.
@@ -81,4 +80,3 @@ jobs:
 # - If you want the action to push commits as a specific user or keep a full commit history, you can create and add
 #   an SSH Deploy Key as `ACTIONS_DEPLOY_KEY` in the repository secrets and leave it set; otherwise the action falls back
 #   to using the provided GITHUB_TOKEN.
-
