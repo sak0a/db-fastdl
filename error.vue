@@ -19,5 +19,5 @@
 </template>
 
 <style lang="sass">
-@import "@/assets/main.sass"
+@use "@/assets/main.sass"
 </style>

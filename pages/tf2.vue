@@ -8,14 +8,16 @@
     <img src="~/assets/img/tf2-logo.webp" alt="Logo" />
     <div class="section__container">
       <NuxtLink to="/" class="back-home-btn gradient-border ">
-        <i class="fa-solid fa-arrow-left text-white text-lg" />
+        <i class="fas fa-arrow-left text-white text-lg" aria-hidden="true"></i>
+        <span class="sr-only">Back to Home</span>
       </NuxtLink>
       <h1>sᴀᴋᴀ's ᴅᴏᴅɢᴇʙᴀʟʟ sᴇʀᴠᴇʀ</h1>
       <h2>Fast Download for Maps / Models / Materials</h2>
       <div class="container__grid">
         <br />
-        <a href="steam://connect/45.81.234.145:27015" class="link__page">
-          45.81.234.145:27015
+        <a href="https://discord.gg/JuxYYVEkzc" target="_blank" rel="noopener noreferrer" class="link__page">
+          <i class="fab fa-discord text-white text-lg mr-2" aria-hidden="true"></i>
+          Join the Discord
         </a>
         <a href="/tf" class="link__page">
           Go to Directory
@@ -26,5 +28,5 @@
 </template>
 
 <style lang="sass">
-@import "@/assets/main.sass"
+@use "@/assets/main.sass"
 </style>

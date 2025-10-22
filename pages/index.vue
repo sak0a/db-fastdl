@@ -22,7 +22,7 @@
 </template>
 
 <style lang="sass">
-@import "@/assets/main.sass"
+@use "@/assets/main.sass"
 .page__container
   .section__container
     .link__page

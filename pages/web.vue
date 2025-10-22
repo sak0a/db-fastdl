@@ -11,7 +11,8 @@
     </div>
     <div class="section__container">
       <NuxtLink to="/" class="back-home-btn gradient-border">
-        <i class="fa-solid fa-arrow-left text-white text-lg" />
+        <i class="fas fa-arrow-left text-white text-lg" aria-hidden="true"></i>
+        <span class="sr-only">Back to Home</span>
       </NuxtLink>
       <h1>Web Development Files</h1>
       <h2>Fast Download for JS / TS / Images / Fonts</h2>
@@ -26,5 +27,5 @@
 </template>
 
 <style lang="sass">
-@import "@/assets/main.sass"
+@use "@/assets/main.sass"
 </style>

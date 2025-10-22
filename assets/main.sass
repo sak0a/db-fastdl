@@ -1,3 +1,8 @@
+// Screen reader only utility class
+.sr-only
+  @apply absolute w-px h-px p-0 -m-px overflow-hidden whitespace-nowrap border-0
+  clip: rect(0, 0, 0, 0)
+
 .spotlight
   background: linear-gradient(45deg, #DC4200FF 0%, #E46A36FF 50%, #002de1 100%)
   filter: blur(20vh)
@@ -47,7 +52,17 @@
       @apply text-sm md:text-sm
     .back-home-btn
       @apply absolute top-6 left-6 md:left-10 md:top-10 px-4 py-2 pt-3 cursor-pointer
+      // Ensure icons are properly displayed
+      i
+        @apply inline-block
+        min-width: 1em
+        text-align: center
     .container__grid
       @apply pt-2 pb-5 grid grid-cols-1 gap-4
       .link__page
         @apply gradient-border sm:text-xl py-2 px-4 sm:py-3 sm:px-6 cursor-pointer
+        // Ensure icons in links are properly spaced
+        i
+          @apply inline-block
+          min-width: 1em
+          text-align: center

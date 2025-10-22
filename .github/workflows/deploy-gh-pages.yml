@@ -1,0 +1,84 @@
+# GitHub Actions workflow to build Nuxt 3 static site and deploy to gh-pages
+# - Builds with `npm run generate` (uses `nuxt generate` from package.json)
+# - Detects generated publish directory (`dist` or `.output/public`)
+# - Copies the TF maps from `assets/tf` into the publish root as `tf/`
+# - Deploys the assembled `deploy/` directory to the `gh-pages` branch
+
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch: {}
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Use Node.js 18
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate static site
+        run: npm run generate
+
+      - name: Prepare publish directory and copy TF maps
+        run: |
+          set -euo pipefail
+          PUBLISH_SRC=""
+          if [ -d "dist" ]; then
+            PUBLISH_SRC="dist"
+          elif [ -d ".output/public" ]; then
+            PUBLISH_SRC=".output/public"
+          else
+            echo "No publish directory found (checked 'dist' and '.output/public')." >&2
+            ls -la
+            exit 1
+          fi
+          echo "Using publish source: $PUBLISH_SRC"
+
+          rm -rf deploy
+          mkdir -p deploy
+          # copy the generated site into deploy
+          cp -a "$PUBLISH_SRC/." deploy/
+
+          # copy maps from assets/tf into deploy/tf so they are available at /db-fastdl/tf/*
+          if [ -d "assets/tf" ]; then
+            mkdir -p deploy/tf
+            cp -a assets/tf/. deploy/tf/
+            echo "Copied assets/tf -> deploy/tf"
+          else
+            echo "No assets/tf directory found; skipping TF map copy"
+          fi
+
+      - name: Deploy to gh-pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          deploy_key: ${{ secrets.ACTIONS_DEPLOY_KEY }}
+          # Fallback to GITHUB_TOKEN if deploy_key is not set; actions-gh-pages prefers deploy_key for user commits,
+          # but GITHUB_TOKEN works for typical cases where you just want to publish to gh-pages branch.
+          publish_dir: ./deploy
+          publish_branch: gh-pages
+          keep_history: true
+        env:
+          # When deploy_key is not provided the action will use GITHUB_TOKEN automatically.
+          # Expose GITHUB_TOKEN explicitly for clarity.
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+# Notes for usage:
+# - This workflow expects your default branch is named `main`. Adjust the `on.push.branches` value if different.
+# - It will publish to the `gh-pages` branch. Configure GitHub Pages in the repository settings to serve from that branch.
+# - If you want the action to push commits as a specific user or keep a full commit history, you can create and add
+#   an SSH Deploy Key as `ACTIONS_DEPLOY_KEY` in the repository secrets and leave it set; otherwise the action falls back
+#   to using the provided GITHUB_TOKEN.
+
